@@ -1,0 +1,30 @@
+{
+  "name": "affinity-mcp-bridge",
+  "version": "0.1.0",
+  "description": "A standalone MCP stdio bridge for Affinity by Canva's local MCP SSE server.",
+  "type": "module",
+  "bin": {
+    "affinity-mcp-bridge": "src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "smoke": "node scripts/smoke-list-tools.mjs",
+    "check": "node --check src/index.js && node --check scripts/smoke-list-tools.mjs"
+  },
+  "keywords": [
+    "affinity",
+    "canva",
+    "mcp",
+    "model-context-protocol",
+    "claude",
+    "codex"
+  ],
+  "author": "Andre Carbajal",
+  "license": "MIT",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0"
+  }
+}
