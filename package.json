@@ -26,5 +26,14 @@
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0"
-  }
+  },
+  "main": "src/index.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/andre-carbajal/affinity-mcp-bridge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/andre-carbajal/affinity-mcp-bridge/issues"
+  },
+  "homepage": "https://github.com/andre-carbajal/affinity-mcp-bridge#readme"
 }

@@ -27,32 +27,43 @@ You can override it with `AFFINITY_MCP_SSE_URL`.
 
 ## Use From GitHub
 
-You can run it directly from GitHub:
+Clone the repository and install dependencies:
+
+```bash
+git clone https://github.com/andre-carbajal/affinity-mcp-bridge.git
+cd affinity-mcp-bridge
+npm install
+```
+
+Then configure your MCP client to run `src/index.js` with Node.
+
+### Claude Desktop
 
 ```json
 {
   "mcpServers": {
     "affinity": {
-      "command": "npx",
-      "args": ["-y", "github:andre-carbajal/affinity-mcp-bridge"]
+      "command": "node",
+      "args": ["/absolute/path/to/affinity-mcp-bridge/src/index.js"],
+      "env": {
+        "AFFINITY_MCP_SSE_URL": "http://localhost:6767/sse"
+      }
     }
   }
 }
 ```
 
-Or install it globally:
-
-```bash
-npm install -g github:andre-carbajal/affinity-mcp-bridge
-```
-
-Then configure your MCP client:
+On Windows, use forward slashes or escaped backslashes:
 
 ```json
 {
   "mcpServers": {
     "affinity": {
-      "command": "affinity-mcp-bridge"
+      "command": "C:/Program Files/nodejs/node.exe",
+      "args": ["C:/Users/you/path/to/affinity-mcp-bridge/src/index.js"],
+      "env": {
+        "AFFINITY_MCP_SSE_URL": "http://localhost:6767/sse"
+      }
     }
   }
 }
@@ -62,19 +73,35 @@ Then configure your MCP client:
 
 ```toml
 [mcp_servers.affinity]
-command = "npx"
-args = ["-y", "github:andre-carbajal/affinity-mcp-bridge"]
+command = "C:/Program Files/nodejs/node.exe"
+args = ["C:/absolute/path/to/affinity-mcp-bridge/src/index.js"]
+startup_timeout_sec = 30
 
 [mcp_servers.affinity.env]
 AFFINITY_MCP_SSE_URL = "http://localhost:6767/sse"
 ```
 
-If you installed globally:
+### Optional Global Install
 
-```toml
-[mcp_servers.affinity]
-command = "affinity-mcp-bridge"
+You can also install from GitHub globally:
+
+```bash
+npm install -g github:andre-carbajal/affinity-mcp-bridge
 ```
+
+Then find the global package path:
+
+```bash
+npm root -g
+```
+
+Use that path with `node`, for example:
+
+```txt
+<npm-root-global>/affinity-mcp-bridge/src/index.js
+```
+
+For Windows MCP clients, calling `node` with the JS file path is more reliable than launching npm's `.cmd` wrapper directly.
 
 ## Tools
 
