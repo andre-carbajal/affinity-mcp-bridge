@@ -1,33 +1,79 @@
 # Affinity MCP Bridge
 
-A standalone MCP stdio bridge for Affinity by Canva's local MCP server.
+Use Affinity by Canva from any MCP-compatible assistant.
 
-This lets MCP clients connect to Affinity without depending on Claude Desktop's installed extension path, such as:
+Affinity MCP Bridge is a small local bridge that lets clients like Claude Desktop, Codex, Cursor, or other MCP hosts connect to Affinity's built-in local MCP server without depending on Claude's private extension folder.
+
+Instead of configuring a path like this:
 
 ```txt
 C:\Users\<you>\AppData\Roaming\Claude\Claude Extensions\...
 ```
 
-The bridge starts as a normal stdio MCP server, then forwards tools, resources, and prompts to Affinity's local SSE server.
+you can install this bridge once and point your MCP client to it.
+
+## What You Can Do
+
+When Affinity is open and its MCP server is enabled, your assistant can use Affinity tools through this bridge. Depending on the tools exposed by your Affinity version, this can include:
+
+- Checking whether Affinity is reachable.
+- Reading Affinity SDK documentation.
+- Running scripts inside the current Affinity document.
+- Rendering spreads or selections for visual verification.
+- Working with Affinity's script library.
+
+This bridge does not replace Affinity. It only connects your MCP client to the Affinity app running on your computer.
 
 ## Requirements
 
 - Node.js 20 or newer.
 - Affinity by Canva 3.2 or newer.
-- Affinity running with **Settings > Model Context Protocol > Enable MCP server** turned on.
-- Restart Affinity after enabling the MCP server.
+- Affinity running on the same computer.
+- Affinity MCP enabled in **Settings > Model Context Protocol > Enable MCP server**.
 
-By default, the bridge connects to:
+After enabling the MCP server, restart Affinity.
+
+By default, Affinity MCP Bridge connects to:
 
 ```txt
 http://localhost:6767/sse
 ```
 
-You can override it with `AFFINITY_MCP_SSE_URL`.
+Most users do not need to change this.
 
-## Use From GitHub
+## Quick Start
 
-Clone the repository and install dependencies:
+1. Open Affinity.
+2. Enable **Settings > Model Context Protocol > Enable MCP server**.
+3. Restart Affinity.
+4. Configure your MCP client with one of the examples below.
+5. Ask your assistant to run the `affinity_status` tool.
+
+If `affinity_status` reports that Affinity is reachable, the bridge is working.
+
+## Install From npm
+
+If the package is available on npm, the easiest setup is to run it with `npx` from your MCP client:
+
+```bash
+npx -y affinity-mcp-bridge
+```
+
+You can also install it globally:
+
+```bash
+npm install -g affinity-mcp-bridge
+```
+
+Then use:
+
+```bash
+affinity-mcp-bridge
+```
+
+## Install From GitHub
+
+If you want to use the GitHub version directly:
 
 ```bash
 git clone https://github.com/andre-carbajal/affinity-mcp-bridge.git
@@ -35,32 +81,89 @@ cd affinity-mcp-bridge
 npm install
 ```
 
-Then configure your MCP client to run `src/index.js` with Node.
+Then configure your MCP client to run:
 
-### Claude Desktop
+```bash
+node /absolute/path/to/affinity-mcp-bridge/src/index.js
+```
+
+On Windows, use the full path to `node.exe` if your MCP client does not find `node` automatically.
+
+## Claude Desktop
+
+For npm or `npx` usage:
+
+```json
+{
+  "mcpServers": {
+    "affinity": {
+      "command": "npx",
+      "args": ["-y", "affinity-mcp-bridge"]
+    }
+  }
+}
+```
+
+For a local GitHub clone:
 
 ```json
 {
   "mcpServers": {
     "affinity": {
       "command": "node",
-      "args": ["/absolute/path/to/affinity-mcp-bridge/src/index.js"],
-      "env": {
-        "AFFINITY_MCP_SSE_URL": "http://localhost:6767/sse"
-      }
+      "args": ["/absolute/path/to/affinity-mcp-bridge/src/index.js"]
     }
   }
 }
 ```
 
-On Windows, use forward slashes or escaped backslashes:
+Windows example:
 
 ```json
 {
   "mcpServers": {
     "affinity": {
       "command": "C:/Program Files/nodejs/node.exe",
-      "args": ["C:/Users/you/path/to/affinity-mcp-bridge/src/index.js"],
+      "args": ["C:/Users/you/path/to/affinity-mcp-bridge/src/index.js"]
+    }
+  }
+}
+```
+
+## Codex
+
+Add this to your Codex `config.toml`.
+
+For npm or `npx` usage:
+
+```toml
+[mcp_servers.affinity]
+command = "npx"
+args = ["-y", "affinity-mcp-bridge"]
+startup_timeout_sec = 30
+```
+
+For a local GitHub clone:
+
+```toml
+[mcp_servers.affinity]
+command = "C:/Program Files/nodejs/node.exe"
+args = ["C:/absolute/path/to/affinity-mcp-bridge/src/index.js"]
+startup_timeout_sec = 30
+```
+
+## Custom Affinity URL
+
+If your Affinity MCP server is not using the default URL, set `AFFINITY_MCP_SSE_URL`.
+
+Claude Desktop example:
+
+```json
+{
+  "mcpServers": {
+    "affinity": {
+      "command": "npx",
+      "args": ["-y", "affinity-mcp-bridge"],
       "env": {
         "AFFINITY_MCP_SSE_URL": "http://localhost:6767/sse"
       }
@@ -69,57 +172,44 @@ On Windows, use forward slashes or escaped backslashes:
 }
 ```
 
-### Codex `config.toml`
+Codex example:
 
 ```toml
 [mcp_servers.affinity]
-command = "C:/Program Files/nodejs/node.exe"
-args = ["C:/absolute/path/to/affinity-mcp-bridge/src/index.js"]
+command = "npx"
+args = ["-y", "affinity-mcp-bridge"]
 startup_timeout_sec = 30
 
 [mcp_servers.affinity.env]
 AFFINITY_MCP_SSE_URL = "http://localhost:6767/sse"
 ```
 
-### Optional Global Install
+## Test Your Setup
 
-You can also install from GitHub globally:
-
-```bash
-npm install -g github:andre-carbajal/affinity-mcp-bridge
-```
-
-Then find the global package path:
-
-```bash
-npm root -g
-```
-
-Use that path with `node`, for example:
+After configuring your MCP client, ask your assistant:
 
 ```txt
-<npm-root-global>/affinity-mcp-bridge/src/index.js
+Use the affinity_status tool and tell me if Affinity is reachable.
 ```
 
-For Windows MCP clients, calling `node` with the JS file path is more reliable than launching npm's `.cmd` wrapper directly.
+Expected result:
 
-## Tools
+- The bridge starts successfully.
+- `affinity_status` is available.
+- Affinity is reported as reachable when the app is open and MCP is enabled.
 
-The bridge exposes:
-
-- `affinity_status`: local diagnostic tool that checks whether Affinity MCP is reachable.
-- All tools reported by Affinity's upstream MCP server, when Affinity is running.
-
-Typical upstream tools include script execution, rendering the current spread/selection, SDK documentation access, and Affinity script-library operations.
+If Affinity is not reachable, the rest of the Affinity tools may not be available yet.
 
 ## Troubleshooting
 
-If `affinity_status` says the bridge cannot connect:
+### `affinity_status` says Affinity is not reachable
 
-1. Open Affinity by Canva.
-2. Enable **Settings > Model Context Protocol > Enable MCP server**.
-3. Restart Affinity.
-4. Check whether another local app is occupying port `6767`.
+Check these items:
+
+1. Affinity is open.
+2. **Settings > Model Context Protocol > Enable MCP server** is enabled.
+3. Affinity was restarted after enabling MCP.
+4. No other app is blocking port `6767`.
 
 On Windows, you can check the port owner with:
 
@@ -131,7 +221,29 @@ Get-NetTCPConnection -LocalPort 6767 | ForEach-Object {
 
 If another app owns `127.0.0.1:6767` but Affinity owns `::1:6767`, keep the default `http://localhost:6767/sse`; do not force `127.0.0.1`.
 
-## Development
+### My MCP client cannot find `npx`
+
+Use the full path to Node and run the local clone instead:
+
+```json
+{
+  "mcpServers": {
+    "affinity": {
+      "command": "C:/Program Files/nodejs/node.exe",
+      "args": ["C:/Users/you/path/to/affinity-mcp-bridge/src/index.js"]
+    }
+  }
+}
+```
+
+### I installed globally but the command does not start
+
+Some Windows MCP clients handle `.cmd` launchers inconsistently. If that happens, prefer either:
+
+- `npx -y affinity-mcp-bridge`
+- `node C:/path/to/affinity-mcp-bridge/src/index.js`
+
+## For Developers
 
 ```bash
 npm install
