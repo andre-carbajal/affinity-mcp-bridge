@@ -24,10 +24,6 @@ jobs:
 
       - run: npm ci
       - run: npm run check
-      - name: Verify npm authentication
-        run: npm whoami --registry=https://registry.npmjs.org
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Verify tag matches package version
         if: github.event_name == 'push'
         shell: bash
@@ -38,6 +34,4 @@ jobs:
             echo "Tag v$tag_version does not match package.json version $package_version."
             exit 1
           fi
-      - run: npm publish --access public --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - run: npm publish --access public
