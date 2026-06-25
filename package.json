@@ -1,15 +1,17 @@
 {
   "name": "affinity-mcp-bridge",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "A standalone MCP stdio bridge for Affinity by Canva's local MCP SSE server.",
   "type": "module",
   "bin": {
-    "affinity-mcp-bridge": "src/index.js"
+    "affinity-mcp-bridge": "dist/index.js"
   },
   "scripts": {
-    "start": "node src/index.js",
-    "smoke": "node scripts/smoke-list-tools.mjs",
-    "check": "node --check src/index.js && node --check scripts/smoke-list-tools.mjs"
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "smoke": "npm run build && node scripts/smoke-list-tools.mjs",
+    "check": "tsc --noEmit && node --check scripts/smoke-list-tools.mjs",
+    "prepublishOnly": "npm run build && npm run check"
   },
   "keywords": [
     "affinity",
@@ -27,7 +29,7 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0"
   },
-  "main": "src/index.js",
+  "main": "dist/index.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/andre-carbajal/affinity-mcp-bridge.git"
@@ -35,5 +37,9 @@
   "bugs": {
     "url": "https://github.com/andre-carbajal/affinity-mcp-bridge/issues"
   },
-  "homepage": "https://github.com/andre-carbajal/affinity-mcp-bridge#readme"
+  "homepage": "https://github.com/andre-carbajal/affinity-mcp-bridge#readme",
+  "devDependencies": {
+    "@types/node": "^26.0.1",
+    "typescript": "^6.0.3"
+  }
 }

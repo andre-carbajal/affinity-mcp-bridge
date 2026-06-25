@@ -79,12 +79,13 @@ If you want to use the GitHub version directly:
 git clone https://github.com/andre-carbajal/affinity-mcp-bridge.git
 cd affinity-mcp-bridge
 npm install
+npm run build
 ```
 
 Then configure your MCP client to run:
 
 ```bash
-node /absolute/path/to/affinity-mcp-bridge/src/index.js
+node /absolute/path/to/affinity-mcp-bridge/dist/index.js
 ```
 
 On Windows, use the full path to `node.exe` if your MCP client does not find `node` automatically.
@@ -111,7 +112,7 @@ For a local GitHub clone:
   "mcpServers": {
     "affinity": {
       "command": "node",
-      "args": ["/absolute/path/to/affinity-mcp-bridge/src/index.js"]
+      "args": ["/absolute/path/to/affinity-mcp-bridge/dist/index.js"]
     }
   }
 }
@@ -124,7 +125,7 @@ Windows example:
   "mcpServers": {
     "affinity": {
       "command": "C:/Program Files/nodejs/node.exe",
-      "args": ["C:/Users/you/path/to/affinity-mcp-bridge/src/index.js"]
+      "args": ["C:/Users/you/path/to/affinity-mcp-bridge/dist/index.js"]
     }
   }
 }
@@ -148,7 +149,7 @@ For a local GitHub clone:
 ```toml
 [mcp_servers.affinity]
 command = "C:/Program Files/nodejs/node.exe"
-args = ["C:/absolute/path/to/affinity-mcp-bridge/src/index.js"]
+args = ["C:/absolute/path/to/affinity-mcp-bridge/dist/index.js"]
 startup_timeout_sec = 30
 ```
 
@@ -230,7 +231,7 @@ Use the full path to Node and run the local clone instead:
   "mcpServers": {
     "affinity": {
       "command": "C:/Program Files/nodejs/node.exe",
-      "args": ["C:/Users/you/path/to/affinity-mcp-bridge/src/index.js"]
+      "args": ["C:/Users/you/path/to/affinity-mcp-bridge/dist/index.js"]
     }
   }
 }
@@ -241,12 +242,13 @@ Use the full path to Node and run the local clone instead:
 Some Windows MCP clients handle `.cmd` launchers inconsistently. If that happens, prefer either:
 
 - `npx -y affinity-mcp-bridge`
-- `node C:/path/to/affinity-mcp-bridge/src/index.js`
+- `node C:/path/to/affinity-mcp-bridge/dist/index.js`
 
 ## For Developers
 
 ```bash
 npm install
+npm run build
 npm run check
 npm run smoke
 ```

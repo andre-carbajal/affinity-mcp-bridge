@@ -4,7 +4,7 @@ import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js"
 
 const transport = new StdioClientTransport({
   command: process.execPath,
-  args: ["src/index.js"],
+  args: ["dist/index.js"],
   env: {
     ...process.env,
     AFFINITY_MCP_SSE_URL:

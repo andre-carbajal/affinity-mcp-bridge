@@ -5,6 +5,7 @@ import { SSEClientTransport } from "@modelcontextprotocol/sdk/client/sse.js";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
+  type CallToolResult,
   CallToolRequestSchema,
   GetPromptRequestSchema,
   ListPromptsRequestSchema,
@@ -12,6 +13,8 @@ import {
   ListResourcesRequestSchema,
   ListToolsRequestSchema,
   ReadResourceRequestSchema,
+  type ServerCapabilities,
+  type Tool,
 } from "@modelcontextprotocol/sdk/types.js";
 
 const VERSION = "0.1.0";
@@ -22,11 +25,11 @@ const CONNECT_TIMEOUT_MS = Number.parseInt(
 );
 const SSE_URL = process.env.AFFINITY_MCP_SSE_URL ?? DEFAULT_SSE_URL;
 
-let upstream = null;
-let upstreamCaps = {};
-let lastError = null;
+let upstream: Client | null = null;
+let upstreamCaps: ServerCapabilities = {};
+let lastError: unknown = null;
 
-const statusTool = {
+const statusTool: Tool = {
   name: "affinity_status",
   description:
     "Check whether the bridge can connect to Affinity by Canva's local MCP server.",
@@ -44,14 +47,14 @@ const statusTool = {
   },
 };
 
-function errorMessage(error) {
+function errorMessage(error: unknown): string {
   if (error instanceof Error) {
     return error.message;
   }
   return String(error);
 }
 
-function connectionHelp() {
+function connectionHelp(): string {
   return [
     `Could not connect to Affinity MCP at ${SSE_URL}.`,
     "",
@@ -66,8 +69,12 @@ function connectionHelp() {
   ].join("\n");
 }
 
-function connectWithTimeout(client, transport, timeoutMs) {
-  return Promise.race([
+function connectWithTimeout(
+  client: Client,
+  transport: SSEClientTransport,
+  timeoutMs: number,
+): Promise<void> {
+  return Promise.race<void>([
     client.connect(transport),
     new Promise((_, reject) => {
       setTimeout(
@@ -78,7 +85,7 @@ function connectWithTimeout(client, transport, timeoutMs) {
   ]);
 }
 
-async function closeUpstream() {
+async function closeUpstream(): Promise<void> {
   if (upstream) {
     try {
       await upstream.close();
@@ -90,7 +97,7 @@ async function closeUpstream() {
   upstreamCaps = {};
 }
 
-async function freshConnect() {
+async function freshConnect(): Promise<Client> {
   await closeUpstream();
 
   const transport = new SSEClientTransport(new URL(SSE_URL));
@@ -106,14 +113,16 @@ async function freshConnect() {
   return client;
 }
 
-async function getUpstream() {
+async function getUpstream(): Promise<Client> {
   if (!upstream) {
     return freshConnect();
   }
   return upstream;
 }
 
-async function callWithReconnect(fn) {
+async function callWithReconnect<T>(
+  fn: (client: Client) => T | Promise<T>,
+): Promise<T> {
   const client = await getUpstream();
   try {
     return await fn(client);
@@ -131,7 +140,7 @@ async function callWithReconnect(fn) {
   }
 }
 
-async function buildStatusResult() {
+async function buildStatusResult(): Promise<CallToolResult> {
   try {
     const tools = await callWithReconnect((client) => client.listTools());
     return {
